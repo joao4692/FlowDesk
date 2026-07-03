@@ -10,8 +10,8 @@ Este projeto é dividido em 6 competências, que também organizam a apresentaç
 
 ## 2. Banco de Dados
 - [x] Modelagem de entidades e relacionamentos (`01-database.md`)
-- [ ] Schema Prisma
-- [ ] Migrations
+- [x] Schema Prisma
+- [x] Migrations
 - [ ] Seed de dados de teste
 
 ## 3. Infraestrutura
