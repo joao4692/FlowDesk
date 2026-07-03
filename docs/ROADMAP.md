@@ -22,7 +22,7 @@ Este projeto é dividido em 6 competências, que também organizam a apresentaç
 - [ ] Docker Compose orquestrando os 4 serviços juntos
 
 ## 4. Backend
-- [ ] Setup do projeto Node.js + TypeScript
+- [x] Setup do projeto Node.js + TypeScript
 - [ ] Conexão com Prisma/Postgres
 - [ ] Autenticação (JWT)
 - [ ] CRUD de Empresas, Usuários, Projetos, Tarefas
