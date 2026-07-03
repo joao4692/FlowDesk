@@ -23,9 +23,10 @@ Este projeto é dividido em 6 competências, que também organizam a apresentaç
 
 ## 4. Backend
 - [x] Setup do projeto Node.js + TypeScript
-- [ ] Conexão com Prisma/Postgres
+- [x] Conexão com Prisma/Postgres
+- [x] Testes (Jest + Supertest) configurados, com 1º teste em Companies
 - [ ] Autenticação (JWT)
-- [ ] CRUD de Empresas, Usuários, Projetos, Tarefas
+- [ ] CRUD completo de Empresas, Usuários, Projetos, Tarefas
 - [ ] Autorização por papel (admin/membro)
 
 ## 5. Frontend
