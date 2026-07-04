@@ -52,6 +52,7 @@ afterAll(async () => {
 2. **Tipos globais do Jest (`describe`, `it`, `expect`) não eram reconhecidos.** Causa: `tsconfig.json` restringia `"types"` só a `["node"]`, escondendo os tipos do Jest. Resolvido adicionando `"jest"` ao array.
 3. **Jest não encerrava o processo após os testes.** Causa: conexão do Prisma com o Postgres ficava aberta. Resolvido fechando a conexão em `afterAll(() => prisma.$disconnect())`.
 4. **TypeScript não reconhecia `req.user` no middleware de autenticação**, mesmo depois de "estender" o tipo `Request` via _module augmentation_ (`declare global { namespace Express { interface Request {...} } }`). Causa raiz: o `tsc` lê o `include` do `tsconfig.json` e por isso enxergava o arquivo de extensão de tipo, mas o `ts-node` (usado pelo `ts-node-dev`) só carrega arquivos alcançáveis por import a partir do ponto de entrada — e esse arquivo nunca é importado por ninguém, só existe para o efeito colateral de estender o tipo. Resolvido adicionando a flag `--files` no script `dev` (`ts-node-dev --files src/index.ts`), que instrui o ts-node a também carregar os arquivos listados no `include`.
+5. **`req.params.id` tipado como `string | string[]`** no Express 5, incompatível com funções que esperam só `string`. Resolvido com um type assertion explícito (`req.params.id as string`) no controller.
 
 ## Aprendizados
 

@@ -29,7 +29,7 @@ Este projeto é dividido em 6 competências, que também organizam a apresentaç
 - [x] Multi-tenancy: Projetos (criar/listar) escopados pela empresa do usuário logado
 - [x] CRUD de Tarefas (criar/listar), protegido contra IDOR (valida que o projeto pertence à empresa do usuário)
 - [ ] Vínculo Usuário↔Projeto (ProjectMember)
-- [ ] CRUD completo de Usuários (editar/listar/deletar)
+- [x] CRUD de Usuários (listar/buscar por id), senha nunca exposta na resposta
 - [ ] Autorização por papel (admin/membro)
 
 ## 5. Frontend
