@@ -19,7 +19,8 @@ API principal do FlowDesk, responsável pelas regras de negócio e acesso ao ban
 - **Arquitetura em camadas** (`routes/` → `controllers/` → `services/`): rotas só apontam pra um controller; controllers lidam com request/response; services concentram a lógica de negócio e o acesso ao Prisma, sem saber nada de HTTP. Permite testar regra de negócio isoladamente e trocar a camada HTTP sem tocar nas regras.
 - **Autenticação via JWT**: login gera um token assinado contendo `userId` e `companyId`; rotas protegidas usam um middleware (`authMiddleware`) que valida o token e popula `req.user` antes de liberar a requisição.
 - **Senhas nunca em texto puro**: hash com `bcrypt` no registro, comparação de hash no login.
-- **Multi-tenancy por empresa**: toda consulta de dados de uma empresa (ex: Projetos) usa `req.user.companyId` — o valor vem do token validado, nunca do corpo da requisição, evitando que um usuário manipule a requisição para acessar dados de outra empresa.
+- **Multi-tenancy por empresa**: toda consulta de dados de uma empresa (ex: Projetos, Tarefas) usa `req.user.companyId` — o valor vem do token validado, nunca do corpo da requisição, evitando que um usuário manipule a requisição para acessar dados de outra empresa.
+- **Proteção contra IDOR nas Tarefas**: antes de criar/listar tarefas de um `projectId`, o service confere se aquele projeto pertence à empresa do usuário logado (`findFirst({ where: { id, companyId } })`). Se não pertencer, devolve **404** (não 403) — assim não revelamos nem que o recurso existe para quem não tem acesso.
 - **Testes de integração, não unitários**: como a lógica de negócio ainda é simples, o valor está em testar a rota completa (request → banco → response), não funções isoladas.
 - **Filosofia de teste por risco**: nem toda rota precisa de teste. Priorizamos o que tem lógica/validação real, não CRUDs triviais só por cobertura.
 

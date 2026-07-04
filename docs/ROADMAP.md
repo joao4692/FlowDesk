@@ -27,7 +27,7 @@ Este projeto é dividido em 6 competências, que também organizam a apresentaç
 - [x] Testes (Jest + Supertest) configurados, com 1º teste em Companies
 - [x] Autenticação (JWT) e middleware de proteção de rotas
 - [x] Multi-tenancy: Projetos (criar/listar) escopados pela empresa do usuário logado
-- [ ] CRUD de Tarefas
+- [x] CRUD de Tarefas (criar/listar), protegido contra IDOR (valida que o projeto pertence à empresa do usuário)
 - [ ] Vínculo Usuário↔Projeto (ProjectMember)
 - [ ] CRUD completo de Usuários (editar/listar/deletar)
 - [ ] Autorização por papel (admin/membro)
