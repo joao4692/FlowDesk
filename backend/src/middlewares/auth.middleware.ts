@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
+
+
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
 
@@ -11,7 +13,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
   const token = authHeader.replace("Bearer ", "");
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET!);
+    const payload = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; companyId: string };
     req.user = payload;
     next();
   } catch (error) {
