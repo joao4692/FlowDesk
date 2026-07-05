@@ -13,8 +13,13 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
   const token = authHeader.replace("Bearer ", "");
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; companyId: string };
-    req.user = payload;
+    const payload = jwt.verify(token, process.env.JWT_SECRET!) as {
+  userId: string;
+  companyId: string;
+  role: "ADMIN" | "MEMBER";
+};
+req.user = payload;
+
     next();
   } catch (error) {
     return res.status(401).json({ error: "Token inválido" });

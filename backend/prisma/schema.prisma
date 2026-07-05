@@ -28,7 +28,15 @@ model User {
   projects  ProjectMember[]
   tasks     Task[]
   createdAt DateTime        @default(now())
+  role      Role            @default(MEMBER)
+
 }
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
 
 model Project {
   id        String          @id @default(uuid())

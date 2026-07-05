@@ -30,7 +30,7 @@ Este projeto é dividido em 6 competências, que também organizam a apresentaç
 - [x] CRUD de Tarefas (criar/listar), protegido contra IDOR (valida que o projeto pertence à empresa do usuário)
 - [x] Vínculo Usuário↔Projeto (ProjectMember), com teste cobrindo bloqueio entre empresas diferentes
 - [x] CRUD de Usuários (listar/buscar por id), senha nunca exposta na resposta
-- [ ] Autorização por papel (admin/membro)
+- [x] Autorização por papel (admin/membro): campo `role` no User, incluído no JWT, e middleware `requireRole` protegendo criação de projetos
 
 ## 5. Frontend
 - [ ] Setup Next.js + TypeScript + Tailwind

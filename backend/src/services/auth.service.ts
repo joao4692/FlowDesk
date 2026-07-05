@@ -2,11 +2,17 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { prisma } from "../prisma";
 
-export async function registerUser(name: string, email: string, password: string, companyId: string) {
+export async function registerUser(
+  name: string,
+  email: string,
+  password: string,
+  companyId: string,
+  role: "ADMIN" | "MEMBER" = "MEMBER"
+) {
   const passwordHash = await bcrypt.hash(password, 10);
 
   const user = await prisma.user.create({
-    data: { name, email, password: passwordHash, companyId },
+    data: { name, email, password: passwordHash, companyId, role },
   });
 
   return user;
@@ -26,7 +32,7 @@ export async function loginUser(email: string, password: string) {
   }
 
   const token = jwt.sign(
-    { userId: user.id, companyId: user.companyId },
+    { userId: user.id, companyId: user.companyId, role: user.role },
     process.env.JWT_SECRET!,
     { expiresIn: "1d" }
   );

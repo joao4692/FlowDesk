@@ -2,12 +2,13 @@ import { Request, Response } from "express";
 import { registerUser, loginUser } from "../services/auth.service";
 
 export async function register(req: Request, res: Response) {
-  const { name, email, password, companyId } = req.body;
+  const { name, email, password, companyId, role } = req.body;
 
-  const user = await registerUser(name, email, password, companyId);
+  const user = await registerUser(name, email, password, companyId, role);
 
-  res.json({ id: user.id, name: user.name, email: user.email });
+  res.json({ id: user.id, name: user.name, email: user.email, role: user.role });
 }
+
 
 export async function login(req: Request, res: Response) {
   const { email, password } = req.body;
