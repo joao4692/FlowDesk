@@ -28,7 +28,9 @@ API principal do FlowDesk, responsável pelas regras de negócio e acesso ao ban
 
 - Arquivo de teste ao lado do arquivo testado, sufixo `.test.ts` (ex: `app.test.ts` ao lado de `app.ts`).
 - Supertest simula requisições HTTP direto contra o `app` Express, sem precisar de servidor rodando.
+- Testes de regra de negócio (ex: `projectMember.service.test.ts`) chamam o `service` diretamente, sem passar por HTTP — mais rápido e testa só o que importa.
 - Conexão do Prisma fechada explicitamente no fim dos testes (`afterAll`), evitando processos pendurados.
+- Token JWT de teste gerado direto com `jwt.sign(...)` no próprio arquivo de teste, sem precisar de um login real, quando a rota testada não depende do conteúdo do token.
 
 ```ts
 describe("Companies", () => {
@@ -53,6 +55,7 @@ afterAll(async () => {
 3. **Jest não encerrava o processo após os testes.** Causa: conexão do Prisma com o Postgres ficava aberta. Resolvido fechando a conexão em `afterAll(() => prisma.$disconnect())`.
 4. **TypeScript não reconhecia `req.user` no middleware de autenticação**, mesmo depois de "estender" o tipo `Request` via _module augmentation_ (`declare global { namespace Express { interface Request {...} } }`). Causa raiz: o `tsc` lê o `include` do `tsconfig.json` e por isso enxergava o arquivo de extensão de tipo, mas o `ts-node` (usado pelo `ts-node-dev`) só carrega arquivos alcançáveis por import a partir do ponto de entrada — e esse arquivo nunca é importado por ninguém, só existe para o efeito colateral de estender o tipo. Resolvido adicionando a flag `--files` no script `dev` (`ts-node-dev --files src/index.ts`), que instrui o ts-node a também carregar os arquivos listados no `include`.
 5. **`req.params.id` tipado como `string | string[]`** no Express 5, incompatível com funções que esperam só `string`. Resolvido com um type assertion explícito (`req.params.id as string`) no controller.
+6. **Teste de Companies passou a falhar (401) depois de proteger a rota com `authMiddleware`.** O teste foi escrito antes da autenticação existir, e não mandava nenhum token. Resolvido gerando um token de teste com `jwt.sign` direto no arquivo de teste e enviando no header `Authorization`.
 
 ## Aprendizados
 
