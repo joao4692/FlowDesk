@@ -12,7 +12,7 @@ Este projeto é dividido em 6 competências, que também organizam a apresentaç
 - [x] Modelagem de entidades e relacionamentos (`01-database.md`)
 - [x] Schema Prisma
 - [x] Migrations
-- [ ] Seed de dados de teste
+- [x] Seed de dados de teste (`prisma/seed.ts`, idempotente — pula se já existir)
 
 ## 3. Infraestrutura
 - [x] PostgreSQL via Docker Compose

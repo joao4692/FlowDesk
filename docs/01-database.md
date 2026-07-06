@@ -16,3 +16,11 @@ Reflete a realidade de startups pequenas: uma pessoa costuma atuar em mais de um
 ## Tecnologia
 - PostgreSQL como banco relacional
 - Prisma como ORM (schema, migrations, type-safety com TypeScript)
+
+## Evolução do schema
+- `role` (enum `ADMIN`/`MEMBER`) adicionado ao `User` para autorização por papel.
+- `onDelete: Cascade` configurado em `Task.project` e `ProjectMember.project`, permitindo apagar um projeto sem deixar tarefas/vínculos órfãos.
+- `email`/`password` do `User` viraram opcionais, e novos campos `username` (no `User`) e `accessPassword` (no `Company`) foram adicionados — suportam um segundo modelo de login (usuário simples + senha compartilhada da empresa) ao lado do login tradicional.
+
+## Seed de dados de teste
+`prisma/seed.ts` cria uma empresa de exemplo ("Empresa Seed") com um admin, um membro, um projeto e 3 tarefas (uma em cada status) — útil para demonstração sem mexer em dados reais. É idempotente: roda `npx prisma db seed` quantas vezes quiser, só cria na primeira vez (verifica se "Empresa Seed" já existe antes de criar).
