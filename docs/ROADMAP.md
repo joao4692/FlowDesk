@@ -16,10 +16,10 @@ Este projeto é dividido em 6 competências, que também organizam a apresentaç
 
 ## 3. Infraestrutura
 - [x] PostgreSQL via Docker Compose
-- [ ] Backend containerizado
-- [ ] Frontend containerizado
+- [x] Backend containerizado (Dockerfile, migrations aplicadas automaticamente no start via `prisma migrate deploy`)
+- [x] Frontend containerizado (multi-stage build, Next.js `output: "standalone"`)
 - [ ] Python service containerizado
-- [ ] Docker Compose orquestrando os 4 serviços juntos
+- [x] Docker Compose orquestrando Postgres + Backend + Frontend juntos (`docker compose up --build`)
 
 ## 4. Backend
 - [x] Setup do projeto Node.js + TypeScript

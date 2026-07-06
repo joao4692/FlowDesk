@@ -1,7 +1,7 @@
 # 03 - Infraestrutura
 
 ## Objetivo
-Rodar o PostgreSQL em ambiente isolado e reprodutível via Docker, sem depender de instalação nativa no sistema operacional.
+Rodar toda a stack do FlowDesk (PostgreSQL, Backend e Frontend) em containers isolados e reprodutíveis via Docker Compose, sem depender de instalação nativa no sistema operacional.
 
 ## Stack
 - Docker
@@ -11,6 +11,10 @@ Rodar o PostgreSQL em ambiente isolado e reprodutível via Docker, sem depender 
 - PostgreSQL roda em container, definido em `docker-compose.yml`, em vez de instalado direto na máquina.
 - Credenciais do banco ficam em `.env` (nunca commitado); `.env.example` é versionado como modelo, sem valores reais.
 - Volume nomeado (`postgres_data`) garante que os dados persistem entre reinícios do container.
+- **Backend containerizado** com um `Dockerfile` simples (single-stage): instala dependências, gera o Prisma Client, compila TypeScript (`npm run build`), e ao iniciar o container roda `npx prisma migrate deploy` (aplica migrations pendentes, sem interação) antes de subir o servidor com `npm start`.
+- **Frontend containerizado** com **multi-stage build** (`deps` → `builder` → `runner`): a imagem final só contém o build "standalone" do Next.js (`output: "standalone"` no `next.config.ts`), sem código-fonte nem dependências de desenvolvimento — imagem final bem menor.
+- **Rede interna do Docker Compose**: serviços se enxergam pelo **nome do serviço**, não por `localhost`. O backend conecta no banco via `postgres:5432` (não `localhost:5432`) quando roda dentro do Compose.
+- **Cache de camadas do Docker**: em ambos os Dockerfiles, `package*.json` é copiado e as dependências instaladas **antes** de copiar o resto do código — assim, mudanças de código não invalidam o cache do `npm install`, deixando rebuilds mais rápidos.
 
 ## Desafios e soluções
 1. **`docker` não vinha com o plugin `docker compose` (v2).** O pacote `docker.io` do apt do Ubuntu/Mint não inclui o plugin necessário. Resolvido instalando pelo repositório oficial do Docker (`docker-ce`, `docker-ce-cli`, `containerd.io`, `docker-compose-plugin`).
@@ -23,3 +27,5 @@ Rodar o PostgreSQL em ambiente isolado e reprodutível via Docker, sem depender 
 - Distros baseadas em Ubuntu (como Linux Mint) nem sempre são reconhecidas por nome em repositórios de terceiros — é preciso mapear para o codinome Ubuntu correspondente.
 - DNS dentro de containers Docker não herda automaticamente a configuração de resolução do host quando esta usa `systemd-resolved`.
 - Debug sistemático (isolar se o problema é permissão, rede ou porta) evita tentativa e erro às cegas.
+- Multi-stage builds existem justamente pra separar "o que preciso pra construir" de "o que preciso pra rodar" — ferramentas de build e dependências de desenvolvimento não precisam (nem devem) ir pra imagem final.
+- Dentro da rede do Docker Compose, `localhost` significa "o próprio container", não "a máquina host" nem "outro serviço" — por isso o backend precisa apontar pro Postgres usando o nome do serviço (`postgres`), não `localhost`.
