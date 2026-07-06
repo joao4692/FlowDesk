@@ -41,3 +41,22 @@ export async function loginUser(email: string, password: string) {
 
   return token;
 }
+export async function registerCompanyAndAdmin(
+  companyName: string,
+  name: string,
+  email: string,
+  password: string
+) {
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  return prisma.$transaction(async (tx) => {
+    const company = await tx.company.create({ data: { name: companyName } });
+
+    const user = await tx.user.create({
+      data: { name, email, password: passwordHash, companyId: company.id, role: "ADMIN" },
+    });
+
+    return { company, user };
+  });
+}
+

@@ -19,6 +19,7 @@ Interface web do FlowDesk, consumindo a API do backend.
 - **Token JWT salvo no `localStorage`** após login bem-sucedido, pra ser reutilizado em requisições futuras autenticadas.
 - **Proteção de rota no lado do cliente**: o Dashboard confere no `useEffect` se existe token no `localStorage`; se não existir, redireciona (`router.push`) pra `/login` antes de tentar buscar qualquer dado.
 - **Redirecionamento pós-login**: em vez de um `alert`, o login usa `useRouter().push("/dashboard")` — fluxo mais próximo de um produto real.
+- **Registro cria empresa + usuário admin juntos** (`/register`), consumindo o novo endpoint `POST /auth/register-company`; ao concluir, redireciona pra `/login` (sem login automático, por simplicidade).
 - **CORS liberado no backend** especificamente para `http://localhost:3000` (origem do frontend em dev), usando o pacote `cors` do Express.
 
 ## Desafios e soluções

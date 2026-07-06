@@ -36,7 +36,7 @@ Este projeto é dividido em 6 competências, que também organizam a apresentaç
 - [x] Setup Next.js + TypeScript + Tailwind
 - [x] Login conectado à API (fetch + JWT salvo no localStorage), com redirecionamento pro dashboard
 - [x] Dashboard de Projetos: rota protegida no cliente (redireciona pra /login sem token), lista projetos via GET /projects
-- [ ] Registro
+- [x] Registro (cria empresa + admin junto, via novo endpoint /auth/register-company)
 - [ ] Criar projeto/tarefa pela interface
 - [ ] Telas de Projetos e Tarefas
 - [ ] Dashboard com indicadores
