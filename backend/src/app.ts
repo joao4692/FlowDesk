@@ -6,6 +6,8 @@ import { projectRoutes } from "./routes/project.routes";
 import { taskRoutes } from "./routes/task.routes";
 import { userRoutes } from "./routes/user.routes";
 import { dashboardRoutes } from "./routes/dashboard.routes";
+import { requireRole } from "./middlewares/requireRole.middleware";
+import { setAccessPassword } from "./services/company.service";
 import cors from "cors";
 
 
@@ -40,3 +42,20 @@ app.get("/companies", authMiddleware, async (_req, res) => {
   const companies = await prisma.company.findMany();
   res.json(companies);
 });
+
+app.patch(
+  "/companies/access-password",
+  authMiddleware,
+  requireRole("ADMIN"),
+  async (req, res) => {
+    const { password } = req.body;
+    const companyId = req.user!.companyId;
+
+    if (!password || password.length < 4) {
+      return res.status(400).json({ error: "Senha deve ter ao menos 4 caracteres" });
+    }
+
+    await setAccessPassword(companyId, password);
+    res.status(204).send();
+  }
+);

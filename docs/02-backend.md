@@ -28,6 +28,11 @@ API principal do FlowDesk, responsável pelas regras de negócio e acesso ao ban
 - **Endpoint de indicadores (`GET /dashboard/summary`)**: agrega contagens (total de projetos, tarefas por status) direto no banco via `prisma.count`, escopado por `companyId` — o frontend não faz essa conta, só exibe o que a API já manda pronto.
 - **Testes de integração, não unitários**: como a lógica de negócio ainda é simples, o valor está em testar a rota completa (request → banco → response), não funções isoladas.
 - **Filosofia de teste por risco**: nem toda rota precisa de teste. Priorizamos o que tem lógica/validação real, não CRUDs triviais só por cobertura.
+- **Cascade delete no banco**: `Task.project` e `ProjectMember.project` têm `onDelete: Cascade` — apagar um projeto remove automaticamente suas tarefas e vínculos de membro, sem precisar orquestrar isso manualmente no código.
+- **Validação de campos obrigatórios** (nome de projeto, título de tarefa): checagem simples (`!valor?.trim()`) devolvendo 400 antes de chamar o Prisma — evita erro cru do banco e dá mensagem clara pro cliente.
+- **Atribuição de tarefa com regra de negócio**: `Task.assigneeId` pode ser setado na criação ou depois via `PATCH /tasks/:id/assignee`. Reatribuir é bloqueado (**409**) enquanto a tarefa está `IN_PROGRESS` — ninguém troca o responsável no meio do serviço.
+- **Onboarding de membros sem e-mail/senha individual**: em vez disso, cada membro ganha um `username` único gerado a partir do nome (slug + sufixo numérico se colidir), e a empresa tem uma **senha geral** (`Company.accessPassword`, hasheada). Login de membro (`POST /auth/login-member`) verifica `username` + a senha geral da empresa dele, não uma senha própria.
+- **Endpoint `GET /auth/me`**: devolve os dados do usuário logado (nome, papel, empresa) a partir do `userId` do token — necessário porque o token só carrega IDs, não nomes, e o frontend precisa exibir "quem está logado" no menu.
 
 ## Como testamos
 
@@ -63,6 +68,8 @@ afterAll(async () => {
 6. **Teste de Companies passou a falhar (401) depois de proteger a rota com `authMiddleware`.** O teste foi escrito antes da autenticação existir, e não mandava nenhum token. Resolvido gerando um token de teste com `jwt.sign` direto no arquivo de teste e enviando no header `Authorization`.
 7. **Após adicionar o campo `role` no schema, o TypeScript reclamava que a propriedade não existia no tipo do `User`.** Causa: alterar o `schema.prisma` não regenera o client automaticamente em todos os casos — foi preciso rodar `npx prisma generate` de novo manualmente. O `ts-node-dev` também voltou a mostrar esse mesmo padrão de erro de cache já visto antes; `npx tsc --noEmit` novamente serviu para confirmar que o código estava correto e isolar o problema como sendo do dev server, não do schema/tipo em si.
 8. **Falha de segurança: registro aceitava `role` livre no corpo da requisição**, permitindo qualquer usuário se autodeclarar `ADMIN`. Resolvido derivando o papel no servidor: primeiro usuário da empresa vira `ADMIN`, os demais sempre `MEMBER` — removido de vez a possibilidade do cliente escolher o próprio papel.
+9. **`email`/`password` viraram opcionais no schema** (pra permitir membros sem conta individual) **e o `loginUser` não tratava `password` nulo** — `bcrypt.compare` esperava `string`, mas o tipo real virou `string | null`. Encontrado comparando `npx tsc --noEmit` antes e depois de rodar `npx prisma generate` (o client não tinha sido regenerado ainda). Corrigido com uma guarda extra: `if (!user || !user.password) throw ...`.
+10. **`npx prisma migrate dev` nem sempre regenera o client na hora** — precisou rodar `npx prisma generate` manualmente de novo depois da migration pra os tipos (`string | null`) aparecerem corretamente. Esse já é o segundo caso desse tipo de soluço; virou hábito rodar `npx tsc --noEmit` logo após qualquer mudança de schema pra confirmar.
 
 ## Aprendizados
 
@@ -70,3 +77,5 @@ afterAll(async () => {
 - Lidar com _breaking changes_ de uma biblioteca recém-lançada (Prisma 7) é parte normal do trabalho real, não um sinal de erro do desenvolvedor.
 - `tsc` e `ts-node` não resolvem arquivos exatamente da mesma forma — vale checar com `npx tsc --noEmit` quando um erro de tipo parece "não fazer sentido" no dev server, pra isolar se é erro de código ou de configuração da ferramenta.
 - Nunca confiar em dado sensível (como `companyId`) vindo do cliente; sempre derivar de algo validado no servidor (o token).
+- Depois de qualquer alteração no `schema.prisma`, rodar `npx prisma generate` explicitamente e conferir com `npx tsc --noEmit` — não assumir que a migration já regenerou tudo sozinha.
+- Simplificar autenticação para um caso de uso real (login por usuário + senha compartilhada da empresa, sem senha individual) é uma escolha de produto válida, desde que documentada como tal — não é "menos seguro" por padrão, é um modelo de ameaça diferente (apropriado pra um grupo pequeno e de confiança, como uma família).

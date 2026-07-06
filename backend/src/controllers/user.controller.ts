@@ -1,5 +1,18 @@
 import { Request, Response } from "express";
-import { listUsers, getUserById } from "../services/user.service";
+import { listUsers, getUserById, createMember } from "../services/user.service";
+
+export async function create(req: Request, res: Response) {
+  const { name } = req.body;
+  const companyId = req.user!.companyId;
+
+  if (!name || !name.trim()) {
+    return res.status(400).json({ error: "Nome é obrigatório" });
+  }
+
+  const user = await createMember(name.trim(), companyId);
+
+  res.json(user);
+}
 
 export async function list(req: Request, res: Response) {
   const companyId = req.user!.companyId;

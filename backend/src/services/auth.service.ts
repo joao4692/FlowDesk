@@ -23,7 +23,7 @@ export async function registerUser(
 export async function loginUser(email: string, password: string) {
   const user = await prisma.user.findUnique({ where: { email } });
 
-  if (!user) {
+  if (!user || !user.password) {
     throw new Error("Credenciais inválidas");
   }
 
@@ -41,6 +41,44 @@ export async function loginUser(email: string, password: string) {
 
   return token;
 }
+export async function memberLogin(username: string, accessPassword: string) {
+  const user = await prisma.user.findUnique({
+    where: { username },
+    include: { company: true },
+  });
+
+  if (!user || !user.company.accessPassword) {
+    throw new Error("Credenciais inválidas");
+  }
+
+  const passwordMatches = await bcrypt.compare(accessPassword, user.company.accessPassword);
+
+  if (!passwordMatches) {
+    throw new Error("Credenciais inválidas");
+  }
+
+  const token = jwt.sign(
+    { userId: user.id, companyId: user.companyId, role: user.role },
+    process.env.JWT_SECRET!,
+    { expiresIn: "1d" }
+  );
+
+  return token;
+}
+
+export async function getCurrentUser(userId: string) {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      company: { select: { id: true, name: true } },
+    },
+  });
+}
+
 export async function registerCompanyAndAdmin(
   companyName: string,
   name: string,
@@ -59,4 +97,3 @@ export async function registerCompanyAndAdmin(
     return { company, user };
   });
 }
-

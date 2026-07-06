@@ -90,23 +90,27 @@ export default function DashboardPage() {
     fetchSummary(token);
   }
 
-  function handleLogout() {
-    localStorage.removeItem("token");
-    router.push("/login");
+  async function handleDeleteProject(e: React.MouseEvent, projectId: string) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!confirm("Excluir este projeto e todas as suas tarefas?")) {
+      return;
+    }
+
+    const token = localStorage.getItem("token")!;
+
+    await fetch(`http://localhost:3001/projects/${projectId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    fetchProjects(token);
+    fetchSummary(token);
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-8 py-4">
-        <h1 className="text-lg font-bold text-slate-900">FlowDesk</h1>
-        <button
-          onClick={handleLogout}
-          className="text-sm font-medium text-slate-500 hover:text-slate-900"
-        >
-          Sair
-        </button>
-      </header>
-
+    <main className="min-h-screen">
       <div className="mx-auto max-w-2xl px-8 py-10">
         {summary && (
           <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -137,6 +141,7 @@ export default function DashboardPage() {
             placeholder="Nome do novo projeto"
             value={newProjectName}
             onChange={(e) => setNewProjectName(e.target.value)}
+            required
             className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
           />
           <button
@@ -156,13 +161,19 @@ export default function DashboardPage() {
 
         <ul className="flex flex-col gap-3">
           {projects.map((project) => (
-            <li key={project.id}>
+            <li key={project.id} className="relative">
               <a
                 href={`/dashboard/${project.id}`}
-                className="block rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:border-indigo-300"
+                className="block rounded-lg border border-slate-200 bg-white px-4 py-3 pr-16 shadow-sm transition hover:border-indigo-300"
               >
                 <p className="font-medium text-slate-900">{project.name}</p>
               </a>
+              <button
+                onClick={(e) => handleDeleteProject(e, project.id)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-red-500 hover:text-red-700"
+              >
+                Excluir
+              </button>
             </li>
           ))}
         </ul>

@@ -31,6 +31,11 @@ Este projeto é dividido em 6 competências, que também organizam a apresentaç
 - [x] Vínculo Usuário↔Projeto (ProjectMember), com teste cobrindo bloqueio entre empresas diferentes
 - [x] CRUD de Usuários (listar/buscar por id), senha nunca exposta na resposta
 - [x] Autorização por papel (admin/membro): campo `role` no User, incluído no JWT, e middleware `requireRole` protegendo criação de projetos
+- [x] Exclusão de Projetos (admin) e Tarefas, com cascade delete no banco (apagar projeto remove tarefas e vínculos de membro)
+- [x] Validação de campos obrigatórios (nome de projeto, título de tarefa) com resposta 400
+- [x] Atribuição de tarefa a um membro (`assigneeId`), com bloqueio de reatribuição enquanto a tarefa está `IN_PROGRESS`
+- [x] Endpoint `GET /auth/me` (dados do usuário logado + empresa, para o menu lateral)
+- [x] Onboarding simplificado de membros: usuário simples (`username`) sem e-mail/senha individual + senha geral da empresa (`Company.accessPassword`) + endpoint `POST /auth/login-member`
 
 ## 5. Frontend
 - [x] Setup Next.js + TypeScript + Tailwind
@@ -40,6 +45,12 @@ Este projeto é dividido em 6 competências, que também organizam a apresentaç
 - [x] Criar projeto pela interface (formulário no dashboard, com tratamento do 403 pra quem não é admin)
 - [x] Página de detalhe do projeto (`/dashboard/[id]`), com lista/criação de Tarefas e mudança de status por clique
 - [x] Dashboard com indicadores (total de projetos e tarefas por status), via `GET /dashboard/summary`
+- [x] Exclusão de projetos e tarefas pela interface, com confirmação
+- [x] Menu lateral (`layout.tsx` de `/dashboard`) com navegação (Projetos/Equipe/Configurações) e dados do usuário logado (via `GET /auth/me`)
+- [x] Fluxo de atribuição de tarefa: seletor + botão "Submeter tarefa" → vira "Tarefa submetida, aguardando status de X" com "Editar" (bloqueado enquanto `IN_PROGRESS`)
+- [x] Tela de Equipe simplificada: admin cria membro só com nome, sistema gera usuário automaticamente
+- [x] Tela de Configurações: admin define a senha geral de acesso da equipe
+- [x] Login com abas: "Login" (admin) e "Entrar como membro" (usuário + senha geral)
 
 ## 6. Python
 - [ ] Setup do microserviço
