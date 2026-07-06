@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { registerUser, loginUser } from "../services/auth.service";
 
 export async function register(req: Request, res: Response) {
-  const { name, email, password, companyId, role } = req.body;
+  const { name, email, password, companyId } = req.body;
 
-  const user = await registerUser(name, email, password, companyId, role);
+  const user = await registerUser(name, email, password, companyId);
 
   res.json({ id: user.id, name: user.name, email: user.email, role: user.role });
 }

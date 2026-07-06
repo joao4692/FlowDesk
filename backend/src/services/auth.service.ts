@@ -6,10 +6,12 @@ export async function registerUser(
   name: string,
   email: string,
   password: string,
-  companyId: string,
-  role: "ADMIN" | "MEMBER" = "MEMBER"
+  companyId: string
 ) {
   const passwordHash = await bcrypt.hash(password, 10);
+
+  const existingUsersCount = await prisma.user.count({ where: { companyId } });
+  const role = existingUsersCount === 0 ? "ADMIN" : "MEMBER";
 
   const user = await prisma.user.create({
     data: { name, email, password: passwordHash, companyId, role },

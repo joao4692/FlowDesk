@@ -22,6 +22,7 @@ API principal do FlowDesk, responsável pelas regras de negócio e acesso ao ban
 - **Multi-tenancy por empresa**: toda consulta de dados de uma empresa (ex: Projetos, Tarefas) usa `req.user.companyId` — o valor vem do token validado, nunca do corpo da requisição, evitando que um usuário manipule a requisição para acessar dados de outra empresa.
 - **Proteção contra IDOR nas Tarefas**: antes de criar/listar tarefas de um `projectId`, o service confere se aquele projeto pertence à empresa do usuário logado (`findFirst({ where: { id, companyId } })`). Se não pertencer, devolve **404** (não 403) — assim não revelamos nem que o recurso existe para quem não tem acesso.
 - **Autorização por papel (RBAC simples)**: campo `role` (`ADMIN` | `MEMBER`) no `User`, incluído no token JWT no login. Um middleware "factory" (`requireRole(role)`, que retorna outro middleware) bloqueia ações sensíveis — hoje, só ADMIN pode criar projetos. Aqui usamos **403** (não 404), já que faz sentido revelar que a rota existe mas o usuário não tem permissão.
+- **Papel nunca é escolhido pelo cliente**: o `role` não vem do corpo da requisição de registro. O primeiro usuário de uma empresa (`prisma.user.count({ where: { companyId } }) === 0`) vira `ADMIN` automaticamente; qualquer registro seguinte vira `MEMBER`, sempre — evita escalonamento de privilégio via auto-registro.
 - **Testes de integração, não unitários**: como a lógica de negócio ainda é simples, o valor está em testar a rota completa (request → banco → response), não funções isoladas.
 - **Filosofia de teste por risco**: nem toda rota precisa de teste. Priorizamos o que tem lógica/validação real, não CRUDs triviais só por cobertura.
 
@@ -58,6 +59,7 @@ afterAll(async () => {
 5. **`req.params.id` tipado como `string | string[]`** no Express 5, incompatível com funções que esperam só `string`. Resolvido com um type assertion explícito (`req.params.id as string`) no controller.
 6. **Teste de Companies passou a falhar (401) depois de proteger a rota com `authMiddleware`.** O teste foi escrito antes da autenticação existir, e não mandava nenhum token. Resolvido gerando um token de teste com `jwt.sign` direto no arquivo de teste e enviando no header `Authorization`.
 7. **Após adicionar o campo `role` no schema, o TypeScript reclamava que a propriedade não existia no tipo do `User`.** Causa: alterar o `schema.prisma` não regenera o client automaticamente em todos os casos — foi preciso rodar `npx prisma generate` de novo manualmente. O `ts-node-dev` também voltou a mostrar esse mesmo padrão de erro de cache já visto antes; `npx tsc --noEmit` novamente serviu para confirmar que o código estava correto e isolar o problema como sendo do dev server, não do schema/tipo em si.
+8. **Falha de segurança: registro aceitava `role` livre no corpo da requisição**, permitindo qualquer usuário se autodeclarar `ADMIN`. Resolvido derivando o papel no servidor: primeiro usuário da empresa vira `ADMIN`, os demais sempre `MEMBER` — removido de vez a possibilidade do cliente escolher o próprio papel.
 
 ## Aprendizados
 
