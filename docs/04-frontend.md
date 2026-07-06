@@ -20,6 +20,9 @@ Interface web do FlowDesk, consumindo a API do backend.
 - **Proteção de rota no lado do cliente**: o Dashboard confere no `useEffect` se existe token no `localStorage`; se não existir, redireciona (`router.push`) pra `/login` antes de tentar buscar qualquer dado.
 - **Redirecionamento pós-login**: em vez de um `alert`, o login usa `useRouter().push("/dashboard")` — fluxo mais próximo de um produto real.
 - **Registro cria empresa + usuário admin juntos** (`/register`), consumindo o novo endpoint `POST /auth/register-company`; ao concluir, redireciona pra `/login` (sem login automático, por simplicidade).
+- **Página de detalhe do projeto** (`app/dashboard/[id]/page.tsx`, rota dinâmica do App Router) lista e cria tarefas daquele projeto; o `id` da URL é lido com o hook `useParams` (Client Component).
+- **Status de tarefa muda por clique**, ciclando `TODO → IN_PROGRESS → DONE → TODO`, via `PATCH /tasks/:id`.
+- **Indicadores no dashboard**: cards com contagens vindas de `GET /dashboard/summary` — o frontend só exibe, toda a agregação acontece no backend.
 - **CORS liberado no backend** especificamente para `http://localhost:3000` (origem do frontend em dev), usando o pacote `cors` do Express.
 
 ## Desafios e soluções

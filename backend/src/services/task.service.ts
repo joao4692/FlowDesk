@@ -25,3 +25,22 @@ export async function listTasks(projectId: string, companyId: string) {
     where: { projectId },
   });
 }
+
+export async function updateTaskStatus(
+  taskId: string,
+  status: "TODO" | "IN_PROGRESS" | "DONE",
+  companyId: string
+) {
+  const task = await prisma.task.findFirst({
+    where: { id: taskId, project: { companyId } },
+  });
+
+  if (!task) {
+    throw new Error("Tarefa não encontrada");
+  }
+
+  return prisma.task.update({
+    where: { id: taskId },
+    data: { status },
+  });
+}

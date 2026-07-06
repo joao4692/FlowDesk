@@ -5,6 +5,7 @@ import { authMiddleware } from "./middlewares/auth.middleware";
 import { projectRoutes } from "./routes/project.routes";
 import { taskRoutes } from "./routes/task.routes";
 import { userRoutes } from "./routes/user.routes";
+import { dashboardRoutes } from "./routes/dashboard.routes";
 import cors from "cors";
 
 
@@ -20,6 +21,7 @@ app.use("/auth", authRoutes);
 app.use("/projects", projectRoutes);
 app.use("/tasks", taskRoutes);
 app.use("/users", userRoutes);
+app.use("/dashboard", dashboardRoutes);
 
 
 

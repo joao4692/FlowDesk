@@ -37,9 +37,9 @@ Este projeto é dividido em 6 competências, que também organizam a apresentaç
 - [x] Login conectado à API (fetch + JWT salvo no localStorage), com redirecionamento pro dashboard
 - [x] Dashboard de Projetos: rota protegida no cliente (redireciona pra /login sem token), lista projetos via GET /projects
 - [x] Registro (cria empresa + admin junto, via novo endpoint /auth/register-company)
-- [ ] Criar projeto/tarefa pela interface
-- [ ] Telas de Projetos e Tarefas
-- [ ] Dashboard com indicadores
+- [x] Criar projeto pela interface (formulário no dashboard, com tratamento do 403 pra quem não é admin)
+- [x] Página de detalhe do projeto (`/dashboard/[id]`), com lista/criação de Tarefas e mudança de status por clique
+- [x] Dashboard com indicadores (total de projetos e tarefas por status), via `GET /dashboard/summary`
 
 ## 6. Python
 - [ ] Setup do microserviço
