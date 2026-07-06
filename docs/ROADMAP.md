@@ -33,8 +33,11 @@ Este projeto é dividido em 6 competências, que também organizam a apresentaç
 - [x] Autorização por papel (admin/membro): campo `role` no User, incluído no JWT, e middleware `requireRole` protegendo criação de projetos
 
 ## 5. Frontend
-- [ ] Setup Next.js + TypeScript + Tailwind
-- [ ] Autenticação (login/registro)
+- [x] Setup Next.js + TypeScript + Tailwind
+- [x] Login conectado à API (fetch + JWT salvo no localStorage), com redirecionamento pro dashboard
+- [x] Dashboard de Projetos: rota protegida no cliente (redireciona pra /login sem token), lista projetos via GET /projects
+- [ ] Registro
+- [ ] Criar projeto/tarefa pela interface
 - [ ] Telas de Projetos e Tarefas
 - [ ] Dashboard com indicadores
 
